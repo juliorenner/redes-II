@@ -175,7 +175,8 @@ main (int argc, char *argv[])
   
   // Create the animation object and configure for specified output
   AnimationInterface anim ("point_to_point.xml");
-
+  anim.EnablePacketMetadata();
+  
   Simulator::Stop (Seconds (10.000));
   Simulator::Run ();
   Simulator::Destroy ();
