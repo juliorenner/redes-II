@@ -27,7 +27,7 @@
 #include "ns3/netanim-module.h"
 
 using namespace ns3;
-NS_LOG_COMPONENT_DEFINE ("point_to_point");
+NS_LOG_COMPONENT_DEFINE ("topology_2");
 
 int
 main (int argc, char *argv[])
@@ -57,44 +57,52 @@ main (int argc, char *argv[])
   // define router node: C
   NodeContainer routerNode_C;
   routerNode_C.Create(1);
+  // define router node: D
+  NodeContainer routerNode_D;
+  routerNode_D.Create(1);
   // define server node: R
   NodeContainer serverNode_R;
   serverNode_R.Create(1);
   
-    // Compose internetwork node mobility
-
-
+  // Compose internetwork node mobility
   MobilityHelper mobility_clientNode_T;
   Ptr<ListPositionAllocator> positionAlloc_clientNode_T = CreateObject<ListPositionAllocator> ();
-  positionAlloc_clientNode_T->Add ( Vector(0.0, 0.0, 0.0));
+  positionAlloc_clientNode_T->Add ( Vector(0.0, 5.0, 0.0));
   mobility_clientNode_T.SetPositionAllocator (positionAlloc_clientNode_T);
   mobility_clientNode_T.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility_clientNode_T.Install (clientNode_T);
   
   MobilityHelper mobility_routerNode_A;
   Ptr<ListPositionAllocator> positionAlloc_routerNode_A = CreateObject<ListPositionAllocator> ();
-  positionAlloc_routerNode_A->Add ( Vector(5.0, 0.0, 0.0));
+  positionAlloc_routerNode_A->Add ( Vector(5.0, 10.0, 0.0));
   mobility_routerNode_A.SetPositionAllocator (positionAlloc_routerNode_A);
   mobility_routerNode_A.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility_routerNode_A.Install (routerNode_A);
 
   MobilityHelper mobility_routerNode_B;
   Ptr<ListPositionAllocator> positionAlloc_routerNode_B = CreateObject<ListPositionAllocator> ();
-  positionAlloc_routerNode_B->Add ( Vector(10.0, 0.0, 0.0));
+  positionAlloc_routerNode_B->Add ( Vector(10.0, 10.0, 0.0));
   mobility_routerNode_B.SetPositionAllocator (positionAlloc_routerNode_B);
   mobility_routerNode_B.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility_routerNode_B.Install (routerNode_B);
 
   MobilityHelper mobility_routerNode_C;
   Ptr<ListPositionAllocator> positionAlloc_routerNode_C = CreateObject<ListPositionAllocator> ();
-  positionAlloc_routerNode_C->Add ( Vector(15.0, 0.0, 0.0));
+  positionAlloc_routerNode_C->Add ( Vector(5.0, 0.0, 0.0));
   mobility_routerNode_C.SetPositionAllocator (positionAlloc_routerNode_C);
   mobility_routerNode_C.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility_routerNode_C.Install (routerNode_C);
+
+  MobilityHelper mobility_routerNode_D;
+  Ptr<ListPositionAllocator> positionAlloc_routerNode_D = CreateObject<ListPositionAllocator> ();
+  positionAlloc_routerNode_D->Add ( Vector(10.0, 0.0, 0.0));
+  mobility_routerNode_D.SetPositionAllocator (positionAlloc_routerNode_D);
+  mobility_routerNode_D.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+  mobility_routerNode_D.Install (routerNode_D);
   
   MobilityHelper mobility_serverNode_R;
   Ptr<ListPositionAllocator> positionAlloc_serverNode_R = CreateObject<ListPositionAllocator> ();
-  positionAlloc_serverNode_R->Add ( Vector(20.0, 0.0, 0.0));
+  positionAlloc_serverNode_R->Add ( Vector(15.0, 5.0, 0.0));
   mobility_serverNode_R.SetPositionAllocator (positionAlloc_serverNode_R);
   mobility_serverNode_R.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility_serverNode_R.Install (serverNode_R);
@@ -107,6 +115,7 @@ main (int argc, char *argv[])
   internetStackHelper.Install (routerNode_A);
   internetStackHelper.Install (routerNode_B);
   internetStackHelper.Install (routerNode_C);
+  internetStackHelper.Install (routerNode_D);
   internetStackHelper.Install (serverNode_R);
 
   // Compose bidirectional links
@@ -116,42 +125,82 @@ main (int argc, char *argv[])
   p2pHelper_link_T_A.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (1)));
   NetDeviceContainer netDevices_link_T_A;
   netDevices_link_T_A = p2pHelper_link_T_A.Install (clientNode_T.Get (0), routerNode_A.Get (0));
+  // define bidirectional link "link_T_C"
+  PointToPointHelper p2pHelper_link_T_C;
+  p2pHelper_link_T_C.SetDeviceAttribute ("DataRate", DataRateValue (DataRate ("100Mb/s")));
+  p2pHelper_link_T_C.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (1)));
+  NetDeviceContainer netDevices_link_T_C;
+  netDevices_link_T_C = p2pHelper_link_T_C.Install (clientNode_T.Get (0), routerNode_C.Get (0));
   // define bidirectional link "link_A_B"
   PointToPointHelper p2pHelper_link_A_B;
   p2pHelper_link_A_B.SetDeviceAttribute ("DataRate", DataRateValue (DataRate ("100Mb/s")));
   p2pHelper_link_A_B.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (1)));
   NetDeviceContainer netDevices_link_A_B;
   netDevices_link_A_B = p2pHelper_link_A_B.Install (routerNode_A.Get (0), routerNode_B.Get (0));
+  // define bidirectional link "link_A_D"
+  PointToPointHelper p2pHelper_link_A_D;
+  p2pHelper_link_A_D.SetDeviceAttribute ("DataRate", DataRateValue (DataRate ("100Mb/s")));
+  p2pHelper_link_A_D.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (1)));
+  NetDeviceContainer netDevices_link_A_D;
+  netDevices_link_A_D = p2pHelper_link_A_D.Install (routerNode_A.Get (0), routerNode_D.Get (0));
   // define bidirectional link "link_B_C"
   PointToPointHelper p2pHelper_link_B_C;
   p2pHelper_link_B_C.SetDeviceAttribute ("DataRate", DataRateValue (DataRate ("100Mb/s")));
   p2pHelper_link_B_C.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (1)));
   NetDeviceContainer netDevices_link_B_C;
   netDevices_link_B_C = p2pHelper_link_B_C.Install (routerNode_B.Get (0), routerNode_C.Get (0));
-  // define bidirectional link "link_C_R"
-  PointToPointHelper p2pHelper_link_C_R;
-  p2pHelper_link_C_R.SetDeviceAttribute ("DataRate", DataRateValue (DataRate ("100Mb/s")));
-  p2pHelper_link_C_R.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (1)));
-  NetDeviceContainer netDevices_link_C_R;
-  netDevices_link_C_R = p2pHelper_link_C_R.Install (routerNode_C.Get (0), serverNode_R.Get (0));
+  // define bidirectional link "link_B_R"
+  PointToPointHelper p2pHelper_link_B_R;
+  p2pHelper_link_B_R.SetDeviceAttribute ("DataRate", DataRateValue (DataRate ("100Mb/s")));
+  p2pHelper_link_B_R.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (1)));
+  NetDeviceContainer netDevices_link_B_R;
+  netDevices_link_B_R = p2pHelper_link_B_R.Install (routerNode_B.Get (0), serverNode_R.Get (0));
+  // define bidirectional link "link_C_D"
+  PointToPointHelper p2pHelper_link_C_D;
+  p2pHelper_link_C_D.SetDeviceAttribute ("DataRate", DataRateValue (DataRate ("100Mb/s")));
+  p2pHelper_link_C_D.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (1)));
+  NetDeviceContainer netDevices_link_C_D;
+  netDevices_link_C_D = p2pHelper_link_C_D.Install (routerNode_C.Get (0), routerNode_D.Get (0));
+  // define bidirectional link "link_D_R"
+  PointToPointHelper p2pHelper_link_D_R;
+  p2pHelper_link_D_R.SetDeviceAttribute ("DataRate", DataRateValue (DataRate ("100Mb/s")));
+  p2pHelper_link_D_R.SetChannelAttribute ("Delay", TimeValue (MilliSeconds (1)));
+  NetDeviceContainer netDevices_link_D_R;
+  netDevices_link_D_R = p2pHelper_link_D_R.Install (routerNode_D.Get (0), serverNode_R.Get (0));
 
   // assign IP addresses for bidirectional links
   // assign IP addresses for bidirectional link "link_T_A"
   ipv4AddressHelper.SetBase ("10.1.1.0", "255.255.255.0");
-  Ipv4InterfaceContainer ipv4Interface_clientNode_T_link_T_A;
-  ipv4Interface_clientNode_T_link_T_A = ipv4AddressHelper.Assign (netDevices_link_T_A);
-  // assign IP addresses for bidirectional link "link_A_B"
+  Ipv4InterfaceContainer ipv4Interface_link_T_A;
+  ipv4Interface_link_T_A = ipv4AddressHelper.Assign (netDevices_link_T_A);
+  // assign IP addresses for bidirectional link "link_T_C"
   ipv4AddressHelper.SetBase ("10.1.2.0", "255.255.255.0");
-  Ipv4InterfaceContainer ipv4Interface_routerNode_A_link_A_B;
-  ipv4Interface_routerNode_A_link_A_B = ipv4AddressHelper.Assign (netDevices_link_A_B);
-  // assign IP addresses for bidirectional link "link_B_C"
+  Ipv4InterfaceContainer ipv4Interface_link_T_C;
+  ipv4Interface_link_T_C = ipv4AddressHelper.Assign (netDevices_link_T_C);
+  // assign IP addresses for bidirectional link "link_A_B"
   ipv4AddressHelper.SetBase ("10.1.3.0", "255.255.255.0");
-  Ipv4InterfaceContainer ipv4Interface_routerNode_B_link_B_C;
-  ipv4Interface_routerNode_B_link_B_C = ipv4AddressHelper.Assign (netDevices_link_B_C);
-  // assign IP addresses for bidirectional link "link_C_R"
+  Ipv4InterfaceContainer ipv4Interface_link_A_B;
+  ipv4Interface_link_A_B = ipv4AddressHelper.Assign (netDevices_link_A_B);
+  // assign IP addresses for bidirectional link "link_A_D"
   ipv4AddressHelper.SetBase ("10.1.4.0", "255.255.255.0");
-  Ipv4InterfaceContainer ipv4Interface_routerNode_C_link_C_R;
-  ipv4Interface_routerNode_C_link_C_R = ipv4AddressHelper.Assign (netDevices_link_C_R);
+  Ipv4InterfaceContainer ipv4Interface_link_A_D;
+  ipv4Interface_link_A_D = ipv4AddressHelper.Assign (netDevices_link_A_D);
+  // assign IP addresses for bidirectional link "link_B_C"
+  ipv4AddressHelper.SetBase ("10.1.5.0", "255.255.255.0");
+  Ipv4InterfaceContainer ipv4Interface_link_B_C;
+  ipv4Interface_link_B_C = ipv4AddressHelper.Assign (netDevices_link_B_C);
+  // assign IP addresses for bidirectional link "link_B_R"
+  ipv4AddressHelper.SetBase ("10.1.6.0", "255.255.255.0");
+  Ipv4InterfaceContainer ipv4Interface_link_B_R;
+  ipv4Interface_link_B_R = ipv4AddressHelper.Assign (netDevices_link_B_R);
+  // assign IP addresses for bidirectional link "link_C_D"
+  ipv4AddressHelper.SetBase ("10.1.7.0", "255.255.255.0");
+  Ipv4InterfaceContainer ipv4Interface_link_C_D;
+  ipv4Interface_link_C_D = ipv4AddressHelper.Assign (netDevices_link_C_D);
+  // assign IP addresses for bidirectional link "link_D_R"
+  ipv4AddressHelper.SetBase ("10.1.8.0", "255.255.255.0");
+  Ipv4InterfaceContainer ipv4Interface_link_D_R;
+  ipv4Interface_link_D_R = ipv4AddressHelper.Assign (netDevices_link_D_R);
 
   // assign and populate global centralized routing "God" tables
   Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
@@ -174,7 +223,7 @@ main (int argc, char *argv[])
   udpechoServerApp_appLink_T_R.Stop (Seconds (10.000));
   
   // Create the animation object and configure for specified output
-  AnimationInterface anim ("point_to_point.xml");
+  AnimationInterface anim ("topology_2.xml");
   anim.EnablePacketMetadata();
   
   Simulator::Stop (Seconds (10.000));
