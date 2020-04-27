@@ -303,15 +303,12 @@ int main (int argc, char *argv[])
   ipv4Interface_link_F_R = ipv4AddressHelper.Assign (netDevices_link_F_R);
 
 
-  // assign and populate global centralized routing "God" tables
-  // Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
-
   // define UDP Echo application named "appLink_T_R"
   uint16_t port_appLink_T_R = 9;
   Ipv4Address remoteIpv4Address_appLink_T_R;
   remoteIpv4Address_appLink_T_R = serverNode_R.Get (0)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
   UdpEchoClientHelper udpechoClient_appLink_T_R (remoteIpv4Address_appLink_T_R, port_appLink_T_R);
-  udpechoClient_appLink_T_R.SetAttribute( "MaxPackets", UintegerValue (300));
+  udpechoClient_appLink_T_R.SetAttribute( "MaxPackets", UintegerValue (180));
   udpechoClient_appLink_T_R.SetAttribute( "Interval", TimeValue ( Seconds(1.0)));
   udpechoClient_appLink_T_R.SetAttribute( "PacketSize", UintegerValue (100));
   ApplicationContainer udpechoClientApp_appLink_T_R = udpechoClient_appLink_T_R.Install (clientNode_T.Get (0));
@@ -330,8 +327,8 @@ int main (int argc, char *argv[])
   anim.EnablePacketMetadata();
   anim.EnableIpv4RouteTracking ("topology_3_routing_rip.xml", Seconds(1), Seconds(180), Seconds(1));
   
-  // Simulator::Schedule (Seconds (55), &TearDownLink, routerNode_E.Get(0), routerNode_F.Get(0), 3, 2);
-  // Simulator::Schedule (Seconds (110), &RecoverLink, routerNode_E.Get(0), routerNode_F.Get(0), 3, 2);
+  Simulator::Schedule (Seconds (55), &TearDownLink, routerNode_B.Get(0), routerNode_C.Get(0), 2, 1);
+  Simulator::Schedule (Seconds (110), &RecoverLink, routerNode_B.Get(0), routerNode_C.Get(0), 2, 1);
 
   NS_LOG_INFO ("Run Simulation.");
   Simulator::Stop (Seconds (180.000));

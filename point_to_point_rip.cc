@@ -55,6 +55,8 @@ int main (int argc, char *argv[])
   NodeContainer serverNode_R;
   serverNode_R.Create(1);
 
+// T   A   B   C   R
+
   // Compose internetwork node mobility
   MobilityHelper mobility_clientNode_T;
   Ptr<ListPositionAllocator> positionAlloc_clientNode_T = CreateObject<ListPositionAllocator> ();
@@ -157,26 +159,26 @@ int main (int argc, char *argv[])
   Ipv4Address remoteIpv4Address_appLink_T_R;
   remoteIpv4Address_appLink_T_R = serverNode_R.Get (0)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ();
   UdpEchoClientHelper udpechoClient_appLink_T_R (remoteIpv4Address_appLink_T_R, port_appLink_T_R);
-  udpechoClient_appLink_T_R.SetAttribute( "MaxPackets", UintegerValue (100));
+  udpechoClient_appLink_T_R.SetAttribute( "MaxPackets", UintegerValue (180));
   udpechoClient_appLink_T_R.SetAttribute( "Interval", TimeValue ( Seconds(1.0)));
   udpechoClient_appLink_T_R.SetAttribute( "PacketSize", UintegerValue (100));
   ApplicationContainer udpechoClientApp_appLink_T_R = udpechoClient_appLink_T_R.Install (clientNode_T.Get (0));
   udpechoClientApp_appLink_T_R.Start (Seconds (1.000));
-  udpechoClientApp_appLink_T_R.Stop (Seconds (100));
+  udpechoClientApp_appLink_T_R.Stop (Seconds (180));
   // add echo server for echo client
   UdpEchoServerHelper udpechoServer_appLink_T_R (port_appLink_T_R);
   ApplicationContainer udpechoServerApp_appLink_T_R = udpechoServer_appLink_T_R.Install (serverNode_R.Get (0));
   udpechoServerApp_appLink_T_R.Start (Seconds (1.000));
-  udpechoServerApp_appLink_T_R.Stop (Seconds (100));
+  udpechoServerApp_appLink_T_R.Stop (Seconds (180));
 
   // Create the animation object and configure for specified output
   AnimationInterface anim ("point_to_point_rip.xml");
   anim.EnablePacketMetadata();
 
-  Simulator::Schedule (Seconds (60), &TearDownLink, routerNode_A.Get(0), 1);
-  Simulator::Schedule (Seconds (80), &RecoverLink, routerNode_A.Get(0), 1);
+  Simulator::Schedule (Seconds (55), &TearDownLink, routerNode_A.Get(0), 1);
+  Simulator::Schedule (Seconds (110), &RecoverLink, routerNode_A.Get(0), 1);
 
-  Simulator::Stop (Seconds (100));
+  Simulator::Stop (Seconds (180));
   Simulator::Run ();
   Simulator::Destroy ();
   return 0;
